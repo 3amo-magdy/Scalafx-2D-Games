@@ -66,30 +66,37 @@ object tetris extends JFXApp3 {
       drawShapeOnTop(s)
     });
   }
-
-  def do_it(): Unit = {
+  def go_dooown():Unit={
+    while(do_the_thing()){
+      // aaaaaaaugh
+    }
+  }
+  def do_the_thing(): Boolean = {
     val row_under_index = (s.y + s.data.size)
-    print(row_under_index);
     if (row_under_index == HEIGHT) {
       nextShape();
-    }
-    val row_under = board(row_under_index)
-    print(util.Arrays.toString(row_under))
-    val last_row = s.data.last
-    var CanGoDown = true;
-    for (i <- 0 until last_row.length) {
-      if (last_row(i) && row_under(i+s.x)) {
-        //can't go down anymore
-        CanGoDown = false
-      }
-    }
-    if (CanGoDown) {
-      print(" --- pushing P\n")
-      s.pushDown();
-      draw()
+      false;
     }
     else {
-      nextShape()
+      val row_under = board(row_under_index)
+      print(util.Arrays.toString(row_under))
+      val last_row = s.data.last
+      var CanGoDown = true;
+      for (i <- 0 until last_row.length) {
+        if (last_row(i) && row_under(i + s.x)) {
+          //can't go down anymore
+          CanGoDown = false
+        }
+      }
+      if (CanGoDown) {
+        print(" --- pushing P\n")
+        s.pushDown();
+        draw()
+      }
+      else {
+        nextShape()
+      }
+      CanGoDown
     }
   }
 
@@ -97,7 +104,7 @@ object tetris extends JFXApp3 {
     stage = new JFXApp3.PrimaryStage {
       title = "Tetris"
       val t = ScheduledService.apply(
-         Task.apply(()-> {print("yo");do_it()})
+         Task.apply(()-> {print("yo");do_the_thing()})
          )
       t.setPeriod(javafx.util.Duration.seconds(1))
       scene = new Scene(WIDTH*fxCELLWIDTH,HEIGHT*fxCELLWIDTH){
@@ -157,8 +164,10 @@ object tetris extends JFXApp3 {
           key.getCode match {
             case KeyCode.LEFT.delegate => if(canPushL()) s.pushL();draw()
             case KeyCode.RIGHT.delegate => if(canPushR()) s.pushR();draw()
-            case KeyCode.ALT.delegate=>if(canRotate(true)) s.rotateCW();draw()
-            case KeyCode.SPACE.delegate=>if(canRotate(false)) s.rotateCCW();draw()
+            case KeyCode.SPACE.delegate=>if(canRotate(true)) s.rotateCW();draw()
+            case KeyCode.ALT.delegate=>if(canRotate(false)) s.rotateCCW();draw()
+            case KeyCode.SHIFT.delegate=> go_dooown();draw()
+
           }
         }
         t.start()
