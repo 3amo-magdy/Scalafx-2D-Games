@@ -73,6 +73,8 @@ object tetris extends JFXApp3 {
         shapes.foreach((a:shape)=>{
           if(a.y<=i&&a.y+a.data.length>=i){
             a.data=a.data.take(i-a.y).++(a.data.drop(i-a.y+1))
+          }
+          if (a.y<=i){
             a.y+=1
           }
         })
