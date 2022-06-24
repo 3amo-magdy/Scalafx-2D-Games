@@ -3,6 +3,7 @@ class shape( var x:Int,var y:Int = 0,
            )
 {
 
+
   def rotateCW()=()->{
     this.data = data.reverse.transpose[Boolean];
   }

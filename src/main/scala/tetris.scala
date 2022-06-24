@@ -3,34 +3,34 @@ import scalafx.application.{JFXApp3, Platform}
 import scalafx.concurrent.{ScheduledService, Task}
 import scalafx.scene.Group.sfxGroup2jfx
 import scalafx.scene.input.KeyCode
-import scalafx.scene.paint.Color.Red
+import scalafx.scene.paint.Color.{Blue, Red, White}
 import scalafx.scene.{Group, Scene, paint}
+import tetris.map
 
 import java.util
 import java.util.{Timer, TimerTask}
 import scala.concurrent.duration.{Duration, SECONDS}
 import scala.util.Random
-
 object tetris extends JFXApp3 {
-  def WIDTH = 8
+  def WIDTH = 16
   def HEIGHT = 12
-  def fxCELLWIDTH = 60
+  def fxCELLWIDTH = 30
 
   var shapes : List[shape] =  List()
   var board = Array.fill[Boolean](HEIGHT,WIDTH)(false)
-
+  var map: util.HashMap[Int,shape] = new util.HashMap[Int,shape]()
   var fxBoard = new Group();
 
-  def randomColor() = paint.Color.Red
+  def randomColor() = (scalafx.scene.paint.Color.rgb(Random.nextInt(255),Random.nextInt(255),Random.nextInt(255)))
+
 
   def generateShape(): shape = {
 //    val w = Random.nextInt()%4 + 1
 //    val h = Random.nextInt()%4 + 1
 //    val data = Array.fill(h,w)(Random.nextBoolean())
-    val data = Array(Array(true,true,true),Array(true,false,true))
+    val data = Array(Array(true,true,true,true))
     val color = randomColor()
-    print(data)
-    new shape(2,0,data,color);
+    new shape(WIDTH/2,0,data,color);
   }
 
   var s =  generateShape()
@@ -38,6 +38,7 @@ object tetris extends JFXApp3 {
     for(i<-0 until s.data.length){
       for(j<-0 until s.data(0).length){
         board(s.y+i)(s.x+j)=board(s.y+i)(s.x+j)||s.data(i)(j)
+        map.put((s.y+i)*WIDTH+s.x+j,s);
       }
     }
     shapes=shapes.appended(s);
@@ -52,10 +53,31 @@ object tetris extends JFXApp3 {
           r.setY((x.y + i) * fxCELLWIDTH)
           r.setWidth(fxCELLWIDTH)
           r.setHeight(fxCELLWIDTH)
-          r.setFill(Red)
-          print(s"${r.getX} , ${r.getY}\n")
+          r.setFill(x.color)
+          r.setStroke(White)
+          r.setArcHeight(2.4)
           sfxGroup2jfx(fxBoard).getChildren.add(r)
         }
+      }
+    }
+  }
+  def reduce():Unit={
+    for(i<-0 until HEIGHT){
+      var rowDone = true;
+      board(i).foreach((x:Boolean)=>{
+        rowDone&&=x
+      })
+      if(rowDone){
+        print(s"row ${i} done")
+        board = (Array.fill(1,WIDTH)(false)).++(board.take(i)).++(board.drop(i+1))
+        shapes.foreach((a:shape)=>{
+          if(a.y<=i&&a.y+a.data.length>=i){
+            a.data=a.data.take(i-a.y).++(a.data.drop(i-a.y+1))
+            a.y+=1
+          }
+        })
+        draw()
+
       }
     }
   }
@@ -79,23 +101,22 @@ object tetris extends JFXApp3 {
     }
     else {
       val row_under = board(row_under_index)
-      print(util.Arrays.toString(row_under))
       val last_row = s.data.last
       var CanGoDown = true;
-      for (i <- 0 until last_row.length) {
-        if (last_row(i) && row_under(i + s.x)) {
-          //can't go down anymore
-          CanGoDown = false
+      for(i<-0 until s.data.length){
+        for(j<- 0 until s.data(i).length){
+          if((s.x+j)>=WIDTH||(s.y+1+i)>=HEIGHT||s.data(i)(j)&&board(s.y+1+i)(s.x+j)){
+            CanGoDown = false;
+          }
         }
       }
       if (CanGoDown) {
-        print(" --- pushing P\n")
         s.pushDown();
-        draw()
       }
       else {
         nextShape()
       }
+      draw()
       CanGoDown
     }
   }
@@ -104,7 +125,7 @@ object tetris extends JFXApp3 {
     stage = new JFXApp3.PrimaryStage {
       title = "Tetris"
       val t = ScheduledService.apply(
-         Task.apply(()-> {print("yo");do_the_thing()})
+         Task.apply(()-> {do_the_thing();reduce();})
          )
       t.setPeriod(javafx.util.Duration.seconds(1))
       scene = new Scene(WIDTH*fxCELLWIDTH,HEIGHT*fxCELLWIDTH){
@@ -128,7 +149,7 @@ object tetris extends JFXApp3 {
         }
         def canPushR(): Boolean = {
           var returned = true;
-          if(s.x>=WIDTH){
+          if(s.x+s.data(0).length>=WIDTH){
             returned = false
           }
           else{
