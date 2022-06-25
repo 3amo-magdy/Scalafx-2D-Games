@@ -11,15 +11,46 @@ import scalafx.scene.text.{Font, Text}
 import scalafx.scene.web.WebEvent.Alert
 import scalafx.scene.{Group, Scene, paint}
 
+import java.io.{File, PrintWriter}
 import java.util
 import java.util.{Timer, TimerTask}
 import scala.concurrent.duration.{Duration, SECONDS}
+import scala.io.Source
 import scala.util.Random
 object tetris extends JFXApp3 {
   def WIDTH = 16
   def HEIGHT = 12
   def fxCELLWIDTH = 30
 
+  def presets={
+    var L = List[List[Array[Boolean]]]()
+    var shp = List[Array[Boolean]]()
+    Source.fromFile("shapes.txt").getLines().foreach((x:String)=>{
+      println(x);
+      if(x.equals(".")){
+        L=L.appended(shp)
+        shp = List()
+      }
+      else {
+        var row = new Array[Boolean](x.length)
+        var i =0;
+        x.foreach((c) => {
+          if (c == '0') {
+            row(i) = false
+          }
+          else {
+            row(i) =(true)
+          }
+          i+=1;
+        })
+        shp=shp.appended(row)
+      }
+    })
+    L
+  }
+  val preset_shapes = presets.map((p)=>{
+    new shape(WIDTH/2,0,p.toArray,randomColor());
+  })
   var shapes : List[shape] =  List()
   var board = Array.fill[Boolean](HEIGHT,WIDTH)(false)
   var fxBoard = new Group();
@@ -44,12 +75,8 @@ object tetris extends JFXApp3 {
 
 
   def generateShape(): shape = {
-//    val w = Random.nextInt()%4 + 1
-//    val h = Random.nextInt()%4 + 1
-//    val data = Array.fill(h,w)(Random.nextBoolean())
-    val data = Array(Array(true,true,true,true))
-    val color = randomColor()
-    new shape(WIDTH/2,0,data,color);
+    val newshape = preset_shapes(math.abs(Random.nextInt(preset_shapes.length)))
+    new shape(WIDTH/2,0,newshape.data.clone(),newshape.color)
   }
 
   var s =  generateShape()
