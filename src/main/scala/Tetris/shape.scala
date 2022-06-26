@@ -1,3 +1,5 @@
+package Tetris
+
 class shape( var x:Int,var y:Int = 0,
              var data: Array[Array[Boolean]],val color:scalafx.scene.paint.Color
            )
