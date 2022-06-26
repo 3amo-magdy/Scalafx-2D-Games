@@ -10,7 +10,6 @@ import scalafx.scene.paint.Color.{Blue, DarkBlue, Grey, LightGrey, White}
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.text.Text
 import scalafx.scene.{Group, Scene}
-import tetris.{do_the_thing, drawShapeOnTop, reduce}
 
 import scala.language.postfixOps
 import scala.util.Random
