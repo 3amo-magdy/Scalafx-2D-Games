@@ -1,20 +1,12 @@
-import javafx.scene.control.{Alert, Label}
 import javafx.scene.shape.Rectangle
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.beans.property.IntegerProperty
 import scalafx.concurrent.{ScheduledService, Task}
 import scalafx.scene.Group.sfxGroup2jfx
-import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.input.KeyCode
 import scalafx.scene.paint.Color.{Blue, Red, White}
 import scalafx.scene.text.{Font, Text}
-import scalafx.scene.web.WebEvent.Alert
 import scalafx.scene.{Group, Scene, paint}
-
-import java.io.{File, PrintWriter}
-import java.util
-import java.util.{Timer, TimerTask}
-import scala.concurrent.duration.{Duration, SECONDS}
 import scala.io.Source
 import scala.util.Random
 object tetris extends JFXApp3 {
@@ -239,7 +231,7 @@ object tetris extends JFXApp3 {
       title = "Tetris"
       val t = ScheduledService.apply(
          Task.apply(()-> {do_the_thing();reduce();})
-         )
+      )
       t.setPeriod(javafx.util.Duration.seconds(1))
       scene = new Scene(WIDTH*fxCELLWIDTH,HEIGHT*fxCELLWIDTH){
         val Root = new Group()
