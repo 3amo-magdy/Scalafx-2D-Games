@@ -17,11 +17,11 @@ import scalafx.scene.{Group, Scene}
 import scala.util.Random
 
 object MovingTile extends game {
-  def WIDTH = 2
+  def WIDTH = 4
 
   def HEIGHT = 4
 
-  def fxCELLWIDTH = 50
+  def fxCELLWIDTH = 100
 
   var movingTile: Int = 0;
   var board = Array.ofDim[Int](HEIGHT, WIDTH)
@@ -113,10 +113,10 @@ object MovingTile extends game {
         r.setArcWidth(3)
         sfxGroup2jfx(fxBoard).getChildren.add(r)
         val t = new Text() {
-          val w = 20
+          val w = 50
           this.text = board(i)(j).toString
-          this.layoutX = (j) * fxCELLWIDTH + fxCELLWIDTH / 2.0 - w / 2
-          this.layoutY = (i) * fxCELLWIDTH + 0.5 * fxCELLWIDTH + w / 2
+          this.layoutX = (j) * fxCELLWIDTH + fxCELLWIDTH / 2.0 - (this.getText.length*w*0.3)
+          this.layoutY = (i) * fxCELLWIDTH + 0.5 * fxCELLWIDTH + w*0.4
           this.fill = White
           this.font.value = new Font("Comic-sans", w)
         }
